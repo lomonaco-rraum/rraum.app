@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cubemap → Equirectangular (2:1)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { color-scheme: dark; }
+    body { margin: 0; font-family: system-ui, sans-serif; background: #0e0e10; color: #eaeaea; }
+    header { padding: 16px 20px; border-bottom: 1px solid #222; }
+    h1 { margin: 0 0 6px; font-size: 20px; }
+    small { color: #aaa; }
+    main { padding: 16px 20px; display: grid; gap: 16px; }
+    .panel { background: #141417; border: 1px solid #222; border-radius: 8px; padding: 14px; }
+    .grid { display: grid; gap: 10px; grid-template-columns: repeat(3, 1fr); }
+    label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+    input[type="file"] { padding: 8px; background: #1a1a1f; border: 1px solid #333; border-radius: 6px; color: #cfcfcf; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; align-items: center; }
+    button { background: #2b6ef3; border: none; color: white; padding: 10px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .status { font-size: 13px; color: #9fb3ff; min-height: 18px; }
+    #viewer { width: 100%; height: 420px; background: #000; border-radius: 8px; }
+    footer { padding: 16px 20px; color: #888; border-top: 1px solid #222; font-size: 12px; }
+  </style>
+</head>
+
+<body>
+<header>
+  <h1>Cubemap → Equirectangular (2:1)</h1>
+  <small>Procesamiento local · Three.js r105 · Visión desde el centro</small>
+</header>
+
+<main>
+
+<section class="panel">
+  <h2 style="margin:0 0 10px;font-size:16px;">Subí las 6 caras del cubo</h2>
+  <div class="grid">
+    <label>Right (+X)<input type="file" id="px" accept="image/*"></label>
+    <label>Left (-X)<input type="file" id="nx" accept="image/*"></label>
+    <label>Top (+Y)<input type="file" id="py" accept="image/*"></label>
+    <label>Bottom (-Y)<input type="file" id="ny" accept="image/*"></label>
+    <label>Front<input type="file" id="pz" accept="image/*"></label>
+    <label>Back<input type="file" id="nz" accept="image/*"></label>
+  </div>
+
+  <div class="actions">
+    <button id="build">Generar cubemap y visor</button>
+    <button id="download" disabled>Descargar PNG 4096×2048</button>
+    <span class="status" id="status"></span>
+  </div>
+</section>
+
+<section class="panel">
+  <h2 style="margin:0 0 10px;font-size:16px;">Vista inmersiva</h2>
+  <div id="viewer"></div>
+</section>
+
+</main>
+
+<footer>
+  Proyección equirectangular correcta para observador interno.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.105.2/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/panolens/build/panolens.min.js"></script>
+
+<script>
+/* ================= Utilidades ================= */
+
+const readAsDataURL = file => new Promise((resolve, reject) => {
+  const r = new FileReader();
+  r.onload = e => resolve(e.target.result);
+  r.onerror = reject;
+  r.readAsDataURL(file);
+});
+
+const statusEl = document.getElementById("status");
+const setStatus = msg => statusEl.textContent = msg || "";
+
+/* ================= Three.js ================= */
+
+const canvas = document.createElement("canvas");
+const renderer = new THREE.WebGLRenderer({
+  canvas,
+  preserveDrawingBuffer: true,
+  antialias: true
+});
+
+const scene = new THREE.Scene();
+const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+const quad = new THREE.Mesh(
+  new THREE.PlaneBufferGeometry(2, 2),
+  new THREE.ShaderMaterial({
+    uniforms: {
+      tCube: { value: null }
+    },
+    vertexShader: `
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      precision highp float;
+      varying vec2 vUv;
+      uniform samplerCube tCube;
+
+      void main() {
+        float PI = 3.141592653589793;
+
+        // Equirectangular estándar
+        float lon = (vUv.x - 0.5) * 2.0 * PI;
+        float lat = (0.5 - vUv.y) * PI;
+
+        // Visión desde dentro del cubo
+        vec3 dir;
+        dir.x = -sin(lon) * cos(lat);
+        dir.y =  sin(lat);
+        dir.z =  cos(lon) * cos(lat);
+
+        gl_FragColor = textureCube(tCube, normalize(dir));
+      }
+    `
+  })
+);
+
+scene.add(quad);
+
+const renderTarget = new THREE.WebGLRenderTarget(4096, 2048, {
+  minFilter: THREE.LinearFilter,
+  magFilter: THREE.LinearFilter,
+  format: THREE.RGBAFormat
+});
+
+/* ================= Panolens ================= */
+
+const viewer = new PANOLENS.Viewer({
+  container: document.getElementById("viewer"),
+  autoHideInfospot: true
+});
+
+let panorama = null;
+
+/* ================= Build ================= */
+
+document.getElementById("build").onclick = async () => {
+  try {
+    const ids = ["px", "nx", "py", "ny", "pz", "nz"];
+    for (const id of ids) {
+      if (!document.getElementById(id).files[0]) {
+        setStatus("Falta subir: " + id.toUpperCase());
+        return;
+      }
+    }
+
+    setStatus("Leyendo imágenes…");
+
+    const urls = [];
+    for (const id of ids) {
+      urls.push(await readAsDataURL(document.getElementById(id).files[0]));
+    }
+
+    setStatus("Cargando cubemap…");
+
+    new THREE.CubeTextureLoader().load(urls, cube => {
+      cube.encoding = THREE.sRGBEncoding;
+      quad.material.uniforms.tCube.value = cube;
+
+      renderer.setSize(2048, 1024, false);
+      renderer.render(scene, camera);
+
+      const panoURL = renderer.domElement.toDataURL("image/png");
+
+      if (panorama) viewer.remove(panorama);
+
+      panorama = new PANOLENS.ImagePanorama(panoURL);
+
+      // Corrección de orientación del visor
+      panorama.rotation.z = Math.PI;
+
+      panorama.addEventListener("enter", () => {
+        viewer.tweenControlCenter(new THREE.Vector3(0, 0, -1), 0);
+      });
+
+      viewer.add(panorama);
+
+      document.getElementById("download").disabled = false;
+      setStatus("Listo ✅");
+    });
+
+  } catch (e) {
+    console.error(e);
+    setStatus("Error al generar panorama");
+  }
+};
+
+/* ================= Download ================= */
+
+document.getElementById("download").onclick = () => {
+  renderer.setRenderTarget(renderTarget);
+  renderer.setSize(4096, 2048, false);
+  renderer.render(scene, camera);
+  renderer.setRenderTarget(null);
+
+  const blitScene = new THREE.Scene();
+
+  const blitMesh = new THREE.Mesh(
+    new THREE.PlaneBufferGeometry(2, 2),
+    new THREE.MeshBasicMaterial({ map: renderTarget.texture })
+  );
+
+  // Correcciones SOLO para la descarga
+  blitMesh.scale.x = -1; // elimina espejo horizontal
+  blitMesh.scale.y = -1; // corrige eje Y del render target
+
+  blitScene.add(blitMesh);
+
+  renderer.render(blitScene, camera);
+
+  const a = document.createElement("a");
+  a.download = "panorama_4096x2048.png";
+  a.href = renderer.domElement.toDataURL("image/png");
+  a.click();
+
+  setStatus("PNG descargado ✅");
+};
+</script>
+</body>
+</html>
