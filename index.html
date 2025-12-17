@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cubemap → Equirectangular (2:1) en navegador</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { color-scheme: dark; }
+    body { margin: 0; font-family: system-ui, sans-serif; background: #0e0e10; color: #eaeaea; }
+    header { padding: 16px 20px; border-bottom: 1px solid #222; }
+    h1 { margin: 0 0 6px; font-size: 20px; }
+    small { color: #aaa; }
+    main { padding: 16px 20px; display: grid; gap: 16px; grid-template-columns: 1fr; }
+    .panel { background: #141417; border: 1px solid #222; border-radius: 8px; padding: 14px; }
+    .grid { display: grid; gap: 10px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+    input[type="file"] { padding: 8px; background: #1a1a1f; border: 1px solid #333; border-radius: 6px; color: #cfcfcf; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+    button { background: #2b6ef3; border: none; color: white; padding: 10px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+    button.secondary { background: #30343a; color: #eaeaea; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .status { font-size: 13px; color: #9fb3ff; }
+    canvas.preview { width: 100%; height: 320px; background: #0b0b0d; border: 1px solid #222; border-radius: 8px; }
+    footer { padding: 16px 20px; color: #888; border-top: 1px solid #222; font-size: 12px; }
+    .note { color: #a7a7a7; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Cubemap → Equirectangular (2:1)</h1>
+    <small>Procesamiento local en el navegador. Compatible con Three.js r105.</small>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h2 style="margin:0 0 10px;font-size:16px;">Subí las 6 caras del cubo</h2>
+      <div class="grid">
+        <label>
+          <span>Right (+X)</span>
+          <input type="file" id="px" accept="image/*" />
+        </label>
+        <label>
+          <span>Left (-X)</span>
+          <input type="file" id="nx" accept="image/*" />
+        </label>
+        <label>
+          <span>Top (+Y)</span>
+          <input type="file" id="py" accept="image/*" />
+        </label>
+        <label>
+          <span>Bottom (-Y)</span>
+          <input type="file" id="ny" accept="image/*" />
+        </label>
+        <label>
+          <span>Front (+Z)</span>
+          <input type="file" id="pz" accept="image/*" />
+        </label>
+        <label>
+          <span>Back (-Z)</span>
+          <input type="file" id="nz" accept="image/*" />
+        </label>
+      </div>
+
+      <div class="actions">
+        <button id="build">Generar cubemap</button>
+        <button id="render" class="secondary" disabled>Render equirectangular (vista previa)</button>
+        <button id="download" disabled>Descargar PNG 4096×2048</button>
+        <span class="status" id="status"></span>
+      </div>
+      <p class="note">Orden requerido por Three.js CubeTextureLoader: [px, nx, py, ny, pz, nz]. Verificá orientación si tu fuente usa otro convenio.</p>
+    </section>
+
+    <section class="panel">
+      <h2 style="margin:0 0 10px;font-size:16px;">Vista previa (canvas)</h2>
+      <canvas id="preview" class="preview"></canvas>
+    </section>
+  </main>
+
+  <footer>
+    Equirectangular: proporción 2:1 (ancho = 2 × alto). El shader mapea latitud/longitud a un vector de dirección y muestrea el cubemap.
+  </footer>
+
+  <!-- Librerías compatibles -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.105.2/build/three.min.js"></script>
+
+  <script>
+    // Utilidades
+    const readAsDataURL = (file) => new Promise((resolve, reject) => {
+      if (!file) return reject(new Error("Archivo faltante"));
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error("Error al leer archivo"));
+      reader.onload = e => resolve(e.target.result);
+      reader.readAsDataURL(file);
+    });
+
+    const statusEl = document.getElementById("status");
+    const setStatus = (msg) => { statusEl.textContent = msg || ""; };
+
+    // Elementos
+    const inputs = {
+      px: document.getElementById("px"),
+      nx: document.getElementById("nx"),
+      py: document.getElementById("py"),
+      ny: document.getElementById("ny"),
+      pz: document.getElementById("pz"),
+      nz: document.getElementById("nz"),
+    };
+    const btnBuild = document.getElementById("build");
+    const btnRender = document.getElementById("render");
+    const btnDownload = document.getElementById("download");
+    const previewCanvas = document.getElementById("preview");
+
+    // Render principal
+    const renderer = new THREE.WebGLRenderer({ canvas: previewCanvas, preserveDrawingBuffer: true, antialias: true });
+    renderer.setClearColor(0x0b0b0d, 1);
+
+    // Escena para shader equirectangular (full-screen quad)
+    const scene = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+    // Plano a pantalla completa
+    const quadGeometry = new THREE.PlaneBufferGeometry(2, 2);
+
+    // Shader: mapea (u,v) → lon/lat → dir → sample cubemap
+    const equirectShader = {
+      uniforms: {
+        tCube: { value: null },
+        flipEnvMap: { value: -1.0 }, // convenios de Three para cubemap
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        precision highp float;
+        varying vec2 vUv;
+        uniform samplerCube tCube;
+        uniform float flipEnvMap;
+
+        // Convierte UV equirectangular (2:1) a dirección 3D
+        // vUv.x ∈ [0,1] → lon ∈ [-PI, PI]
+        // vUv.y ∈ [0,1] → lat ∈ [PI/2, -PI/2] (invertimos para coord. pantalla)
+        void main() {
+          float PI = 3.14159265358979323846264;
+          float lon = (vUv.x * 2.0 - 1.0) * PI;      // -PI .. PI
+          float lat = (0.5 - vUv.y) * PI;            // -PI/2 .. PI/2
+
+          // Dirección en espacio Y-up, Z-forward (convención Three)
+          float x = cos(lat) * sin(lon);
+          float y = sin(lat);
+          float z = cos(lat) * cos(lon);
+
+          vec3 dir = normalize(vec3(x, y, z));
+          dir.x *= flipEnvMap; // Ajuste de inversión si fuera necesario
+
+          vec4 col = textureCube(tCube, dir);
+          gl_FragColor = col;
+        }
+      `
+    };
+
+    let cubeTexture = null;
+    let quadMaterial = new THREE.ShaderMaterial({
+      uniforms: THREE.UniformsUtils.clone(equirectShader.uniforms),
+      vertexShader: equirectShader.vertexShader,
+      fragmentShader: equirectShader.fragmentShader
+    });
+    const quad = new THREE.Mesh(quadGeometry, quadMaterial);
+    scene.add(quad);
+
+    // Render target de salida (4096×2048)
+    const targetWidth = 4096;
+    const targetHeight = 2048;
+    const renderTarget = new THREE.WebGLRenderTarget(targetWidth, targetHeight, {
+      minFilter: THREE.LinearFilter,
+      magFilter: THREE.LinearFilter,
+      format: THREE.RGBAFormat
+    });
+
+    // Construir cubemap desde inputs
+    btnBuild.addEventListener("click", async () => {
+      try {
+        setStatus("Leyendo imágenes…");
+        const urls = [
+          await readAsDataURL(inputs.px.files[0]), // +X (right)
+          await readAsDataURL(inputs.nx.files[0]), // -X (left)
+          await readAsDataURL(inputs.py.files[0]), // +Y (top)
+          await readAsDataURL(inputs.ny.files[0]), // -Y (bottom)
+          await readAsDataURL(inputs.pz.files[0]), // +Z (front)
+          await readAsDataURL(inputs.nz.files[0])  // -Z (back)
+        ];
+
+        setStatus("Cargando cubemap…");
+        const loader = new THREE.CubeTextureLoader();
+        loader.setCrossOrigin("anonymous");
+        cubeTexture = loader.load(urls, () => {
+          setStatus("Cubemap listo ✅");
+          quadMaterial.uniforms.tCube.value = cubeTexture;
+          btnRender.disabled = false;
+          btnDownload.disabled = false;
+        }, undefined, (err) => {
+          console.error(err);
+          setStatus("Error al cargar el cubemap");
+        });
+      } catch (e) {
+        console.error(e);
+        setStatus("Faltan archivos o hubo un error al leerlos");
+      }
+    });
+
+    // Render a preview (equirectangular) en el canvas visible
+    btnRender.addEventListener("click", () => {
+      if (!cubeTexture) return setStatus("Primero generá el cubemap");
+      // Ajustar canvas de vista previa (p.ej. 2048×1024)
+      const w = 2048, h = 1024;
+      renderer.setSize(w, h, false);
+      renderer.setViewport(0, 0, w, h);
+      renderer.setScissorTest(false);
+      renderer.render(scene, camera);
+      setStatus("Vista previa renderizada ✅");
+    });
+
+    // Render al renderTarget 4096×2048 y descargar PNG
+    btnDownload.addEventListener("click", () => {
+      if (!cubeTexture) return setStatus("Primero generá el cubemap");
+
+      // 1) Renderizamos al target offscreen
+      renderer.setSize(targetWidth, targetHeight, false);
+      renderer.setViewport(0, 0, targetWidth, targetHeight);
+      renderer.setRenderTarget(renderTarget);
+      renderer.clear();
+      renderer.render(scene, camera);
+      renderer.setRenderTarget(null);
+
+      // 2) Blit del renderTarget al framebuffer (pantalla/canvas) para exportar con toDataURL
+      const blitScene = new THREE.Scene();
+      const blitCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+      const blitMaterial = new THREE.MeshBasicMaterial({ map: renderTarget.texture });
+      const blitQuad = new THREE.Mesh(new THREE.PlaneBufferGeometry(2, 2), blitMaterial);
+      blitScene.add(blitQuad);
+
+      renderer.setSize(targetWidth, targetHeight, false);
+      renderer.setViewport(0, 0, targetWidth, targetHeight);
+      renderer.render(blitScene, blitCamera);
+
+      // 3) Descargar
+      const a = document.createElement("a");
+      a.download = "panorama_equirectangular_4096x2048.png";
+      a.href = renderer.domElement.toDataURL("image/png");
+      a.click();
+
+      setStatus("PNG descargado ✅");
+    });
+  </script>
+</body>
+</html>
