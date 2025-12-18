@@ -117,6 +117,9 @@ const viewer = new PANOLENS.Viewer({
   enableFullscreen: true
 });
 
+// 🔹 Modificación pedida: fondo transparente en el renderer
+viewer.renderer.setClearColor(0x000000, 0);
+
 let panorama = null;
 
 /* ================= Build ================= */

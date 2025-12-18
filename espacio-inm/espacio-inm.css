@@ -5,7 +5,32 @@
   grid-template-columns: 360px 1fr;
   gap: 48px;
   align-items: start;
-  padding: 4cm; /* margen general de 4cm */
+  padding: 4cm;
+}
+
+/* ================= Header ================= */
+
+header {
+  padding-left: 4cm;
+  padding-right: 4cm;
+  margin-top: 0;
+  margin-bottom: 24px;
+}
+
+header h1 {
+  font-family: var(--font-main);
+  font-size: 24px;
+  font-weight: normal;
+  color: #000;
+  margin: 0;
+}
+
+header p.muted {
+  font-family: var(--font-main);
+  font-size: 14px;
+  font-weight: normal;
+  color: var(--muted, #666666);
+  margin: 4px 0 0 0;
 }
 
 /* ================= Columna izquierda ================= */
@@ -24,9 +49,9 @@
 .file-btn {
   width: 60px;
   height: 60px;
-  border: none; /* quitar borde */
-  background: #fff; /* mismo color que el fondo */
-  font-size: 60px; /* agrandado al doble */
+  border: none;
+  background: #fff;
+  font-size: 60px;
   font-weight: normal;
   color: #000;
   cursor: pointer;
@@ -38,7 +63,7 @@
 .file-btn img {
   width: 100%;
   height: 100%;
-  object-fit: contain; /* respeta proporción */
+  object-fit: contain;
   display: block;
 }
 
@@ -59,8 +84,8 @@
 }
 
 .actions button {
-  width: 130px;   /* ancho fijo */
-  height: 25px;   /* alto fijo */
+  width: 130px;
+  height: 25px;
   font-size: 12px;
   font-weight: normal;
   background: transparent;
@@ -72,9 +97,9 @@
 .actions select,
 .actions select option {
   margin-top: 8px;
-  width: 130px;          /* opcional: achicar el ancho */
-  text-align: center;    /* centra el texto de las opciones */
-  text-align-last: center; /* centra la opción seleccionada */
+  width: 130px;
+  text-align: center;
+  text-align-last: center;
   font-family: var(--font-main);
   font-size: 12px;
 }
@@ -95,9 +120,9 @@
 
 #viewer {
   width: 100%;
-  aspect-ratio: 16 / 9;   /* proporción fija 16:9 */
-  border: 1px solid var(--line, #e5e5e5);
-  border-radius: 8px;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--line, #ffffff);
+  border-radius: 0px; /* redondeo aumentado */
   background: #000;
   box-sizing: border-box;
 }
@@ -109,35 +134,30 @@
   font-size: 16px;
   font-weight: normal;
   color: #000;
-  /* Se recomienda ajustar z-index o coordenadas Z en JS */
 }
 
 /* ================= Footer ================= */
 
 footer {
-  color: #555353;                 /* color del texto */
-  text-align: center;             /* centra el contenido */
-  padding: 16px;                  /* espacio interno */
+  color: #555353;
+  text-align: center;
+  padding: 16px;
   font-family: var(--font-main);
   font-size: 12px;
-  position: fixed;                /* lo fija en la ventana */
-  bottom: 0;                      /* lo coloca al final */
+  position: fixed;
+  bottom: 0;
   left: 0;
-  width: 100%;                    /* ocupa todo el ancho */
+  width: 100%;
 }
 
 /* ================= Panolens UI ================= */
 
 .panolens-infobar,
-.panolens-control-bar,
 .panolens-control-bar input,
 .panolens-control-bar select,
 .panolens-control-bar option {
   font-family: var(--font-main) !important;
   font-size: 12px !important;
-  background: transparent !important;
-  border: 1px solid var(--line, #e5e5e5) !important;
-  border-radius: 4px !important;
   color: var(--muted) !important;
   padding: 2px 6px !important;
   text-align: center !important;
