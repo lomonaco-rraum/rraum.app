@@ -1,215 +1,248 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<title>rraum.LAB · Plataforma de recursos gráficos</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8" />
+  <title>rraum.LAB — Plataforma de recursos gráficos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<style>
-  :root {
-    --bg: #ffffff;
-    --fg: #000000;
-    --muted: #666;
-    --line: #e5e5e5;
-  }
+  <style>
+    /* ================= Base ================= */
 
-  body {
-    margin: 0;
-    font-family: "Space Mono", monospace;
-    background: var(--bg);
-    color: var(--fg);
-  }
+    :root {
+      --fg: #000;
+      --bg: #fff;
+      --muted: #777;
+      --line: #ddd;
+    }
 
-  /* ---------- Layout ---------- */
+    * {
+      box-sizing: border-box;
+    }
 
-  header {
-    padding: 32px;
-    border-bottom: 1px solid var(--line);
-  }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      line-height: 1.45;
+    }
 
-  h1 {
-    font-size: 28px;
-    margin: 0;
-    font-weight: 400;
-  }
+    a {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+    }
 
-  h2 {
-    font-size: 16px;
-    font-weight: 400;
-    color: var(--muted);
-    margin-top: 8px;
-  }
+    a:hover {
+      border-bottom-color: var(--fg);
+    }
 
-  main {
-    padding: 32px;
-  }
+    button {
+      all: unset;
+      cursor: pointer;
+      color: inherit;
+      border-bottom: 1px solid transparent;
+    }
 
-  section {
-    display: none;
-  }
+    button:hover {
+      border-bottom-color: var(--fg);
+    }
 
-  section.active {
-    display: block;
-  }
+    /* ================= Layout ================= */
 
-  /* ---------- Language ---------- */
+    header, section {
+      padding: 80px 60px;
+      max-width: 960px;
+    }
 
-  .lang {
-    position: fixed;
-    top: 24px;
-    right: 32px;
-    font-size: 12px;
-  }
+    header {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 40px;
+    }
 
-  .lang button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    margin-left: 8px;
-    color: var(--muted);
-  }
+    section {
+      border-top: 1px solid var(--line);
+    }
 
-  /* ---------- Tabs ---------- */
+    h1, h2, h3 {
+      font-weight: normal;
+      margin: 0;
+    }
 
-  .tabs {
-    display: flex;
-    gap: 24px;
-    border-bottom: 1px solid var(--line);
-    padding-bottom: 12px;
-    margin-bottom: 24px;
-  }
+    h1 {
+      font-size: 40px;
+    }
 
-  .tabs button {
-    background: none;
-    border: none;
-    font-family: inherit;
-    font-size: 14px;
-    cursor: pointer;
-    color: var(--muted);
-    padding: 4px 0;
-  }
+    h2 {
+      font-size: 22px;
+      margin-bottom: 24px;
+    }
 
-  .tabs button.active {
-    color: var(--fg);
-    border-bottom: 1px solid var(--fg);
-  }
+    p {
+      max-width: 620px;
+    }
 
-  /* ---------- Workspace ---------- */
+    .muted {
+      color: var(--muted);
+    }
 
-  .workspace {
-    width: 100%;
-    height: 70vh;
-    border: 1px solid var(--line);
-  }
+    /* ================= Header ================= */
 
-  iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-  }
+    .lang {
+      display: flex;
+      gap: 12px;
+      font-size: 14px;
+    }
 
-  /* ---------- Links ---------- */
+    .enter {
+      margin-top: 40px;
+      font-size: 16px;
+    }
 
-  a {
-    color: inherit;
-    text-decoration: none;
-    border-bottom: 1px solid currentColor;
-  }
-</style>
+    /* ================= Tabs ================= */
 
-<!-- Fuente accesible provisoria -->
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400&display=swap" rel="stylesheet">
+    .tabs {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 40px;
+      font-size: 15px;
+    }
+
+    .tab {
+      padding-bottom: 4px;
+      border-bottom: 1px solid transparent;
+    }
+
+    .tab.active {
+      border-bottom-color: var(--fg);
+    }
+
+    .tool {
+      max-width: 640px;
+    }
+
+    .tool button {
+      margin-top: 24px;
+    }
+
+    /* ================= Footer ================= */
+
+    footer {
+      padding: 60px;
+      border-top: 1px solid var(--line);
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* ================= Responsive ================= */
+
+    @media (max-width: 720px) {
+      header, section {
+        padding: 60px 24px;
+      }
+
+      h1 {
+        font-size: 32px;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<div class="lang">
-  <button>ES</button>
-  <button>EN</button>
-</div>
+<!-- ================= Portada ================= -->
 
-<header>
-  <h1>rraum.LAB</h1>
-  <h2>Plataforma de recursos gráficos</h2>
+<header id="home">
+  <div>
+    <h1>rraum.LAB</h1>
+    <p class="muted">Plataforma de recursos gráficos</p>
+    <p class="muted">Arte · Arquitectura · Ciencia aplicada</p>
+  </div>
+
+  <div class="lang">
+    <span>ES</span>
+    <span class="muted">/</span>
+    <span class="muted">EN</span>
+  </div>
+
+  <div>
+    <p>Paula Lomonaco</p>
+    <a href="#about" class="muted">sobre la autora</a>
+  </div>
+
+  <div class="enter">
+    <a href="#resources">ingresar a recursos →</a>
+  </div>
 </header>
 
-<main>
-
-<!-- ---------- PORTADA ---------- -->
-
-<section id="home" class="active">
-  <p>
-    rraum.LAB es un espacio de investigación, docencia y práctica artística
-    dedicado a la exploración entre arte, arquitectura y ciencia aplicada.
-  </p>
-
-  <p>
-    <strong>Autoría:</strong><br />
-    <a href="#" onclick="openSection('about')">Paula Lomonaco</a>
-  </p>
-
-  <p>
-    <a href="#" onclick="openSection('resources')">Ingresar a recursos gráficos</a>
-  </p>
-</section>
-
-<!-- ---------- ABOUT ---------- -->
-
-<section id="about">
-  <p>
-    Soy docente, investigadora y artista visual.  
-    Este proyecto surge como un laboratorio abierto de herramientas gráficas,
-    sistemas de representación y visualización espacial.
-  </p>
-
-  <p>
-    <a href="#" onclick="openSection('home')">← Volver</a>
-  </p>
-</section>
-
-<!-- ---------- RECURSOS ---------- -->
+<!-- ================= Recursos ================= -->
 
 <section id="resources">
+  <h2>Recursos gráficos</h2>
 
-  <div class="tabs">
-    <button class="active" data-tool="inm">espacio.INM</button>
-    <button data-tool="ra">visualización.RA</button>
-    <button data-tool="sg">sistemas.GR</button>
-  </div>
-
-  <div class="workspace">
-    <iframe id="tool-frame" src="espacio-inm/index.html"></iframe>
-  </div>
-
+  <p>
+    Herramientas diseñadas para explorar, construir y comprender
+    espacios, sistemas de representación y visualizaciones desde
+    una perspectiva artística, técnica y crítica.
+  </p>
 </section>
 
-</main>
+<!-- ================= Espacios de trabajo ================= -->
+
+<section id="tools">
+  <h2>Espacios de trabajo</h2>
+
+  <div class="tabs">
+    <div class="tab active">espacio.INM</div>
+    <div class="tab muted">visualización.RA</div>
+    <div class="tab muted">sistemas.GR</div>
+  </div>
+
+  <div class="tool">
+    <p>
+      Conversión de cubemaps a proyección equirectangular (2:1),
+      pensada desde la percepción del observador ubicado en el
+      centro del espacio.
+    </p>
+
+    <button onclick="openTool()">
+      abrir herramienta →
+    </button>
+  </div>
+</section>
+
+<!-- ================= Sobre ================= -->
+
+<section id="about">
+  <h2>Paula Lomonaco</h2>
+
+  <p>
+    Docente, investigadora y artista visual. Su trabajo explora
+    cruces entre arte, arquitectura y ciencia aplicada, con foco
+    en los sistemas gráficos como herramientas de pensamiento
+    y producción.
+  </p>
+
+  <p>
+    rraum.LAB surge como un espacio de experimentación, archivo
+    y desarrollo de recursos gráficos orientados a la práctica,
+    la investigación y la enseñanza.
+  </p>
+</section>
+
+<!-- ================= Footer ================= -->
+
+<footer>
+  rraum.LAB
+</footer>
 
 <script>
-  function openSection(id) {
-    document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
-    document.getElementById(id).classList.add("active");
+  function openTool() {
+    window.location.href = "espacio-inm/espacio-inm.html";
   }
-
-  const frame = document.getElementById("tool-frame");
-  const tabs = document.querySelectorAll(".tabs button");
-
-  tabs.forEach(tab => {
-    tab.addEventListener("click", () => {
-      tabs.forEach(t => t.classList.remove("active"));
-      tab.classList.add("active");
-
-      if (tab.dataset.tool === "inm") {
-        frame.src = "espacio-inm/index.html";
-      }
-      if (tab.dataset.tool === "ra") {
-        frame.src = "ra/index.html";
-      }
-      if (tab.dataset.tool === "sg") {
-        frame.src = "sistemas-graficos/index.html";
-      }
-    });
-  });
 </script>
 
 </body>

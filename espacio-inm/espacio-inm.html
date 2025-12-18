@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>espacio.INM — rraum.LAB</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="espacio-inm.css">
+</head>
+<body>
+
+<header>
+  <h1>espacio.INM</h1>
+  <p class="muted">Conversión de cubemaps a proyección equirectangular (2:1)</p>
+</header>
+
+<main>
+
+  <section class="tool-main">
+
+    <!-- Columna izquierda -->
+    <div class="cube-inputs">
+
+      <div class="cube-face">
+        <button type="button" class="file-btn" data-target="px">+</button>
+        <span>Right (+X)</span>
+        <input type="file" id="px" accept="image/*" style="display:none;">
+      </div>
+
+      <div class="cube-face">
+        <button type="button" class="file-btn" data-target="nx">+</button>
+        <span>Left (−X)</span>
+        <input type="file" id="nx" accept="image/*" style="display:none;">
+      </div>
+
+      <div class="cube-face">
+        <button type="button" class="file-btn" data-target="py">+</button>
+        <span>Top (+Y)</span>
+        <input type="file" id="py" accept="image/*" style="display:none;">
+      </div>
+
+      <div class="cube-face">
+        <button type="button" class="file-btn" data-target="ny">+</button>
+        <span>Bottom (−Y)</span>
+        <input type="file" id="ny" accept="image/*" style="display:none;">
+      </div>
+
+      <div class="cube-face">
+        <button type="button" class="file-btn" data-target="pz">+</button>
+        <span>Front (+Z)</span>
+        <input type="file" id="pz" accept="image/*" style="display:none;">
+      </div>
+
+      <div class="cube-face">
+        <button type="button" class="file-btn" data-target="nz">+</button>
+        <span>Back (Z-)</span>
+        <input type="file" id="nz" accept="image/*" style="display:none;">
+      </div>
+
+      <div class="actions">
+        <button id="build">Crear</button>
+        <button id="download" disabled>Descargar</button>
+        <select id="quality">
+          <option value="1024x512">Baja</option>
+          <option value="2048x1024">Media</option>
+          <option value="4096x2048" selected>Alta</option>
+        </select>
+        <div class="status" id="status"></div>
+      </div>
+
+    </div>
+
+    <!-- Columna derecha -->
+    <div class="viewer-panel">
+      <div id="viewer"></div>
+    </div>
+
+  </section>
+
+</main>
+
+<footer>
+  By rraum.LAB
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.105.2/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/panolens/build/panolens.min.js"></script>
+<script src="espacio-inm.js"></script>
+
+</body>
+</html>
