@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>espacio.RA — rraum.LAB</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="espacio-ra.css">
+</head>
+<body>
+
+<header>
+  <h1>espacio.RA</h1>
+  <p class="muted">Visualización de modelos OBJ / STL</p>
+</header>
+
+<main>
+  <section class="tool-main">
+    <!-- Columna izquierda -->
+    <div class="cube-inputs">
+      <div class="actions">
+        <!-- 1) Menú -->
+        <select id="view-mode" aria-label="Modo de visualización">
+          <option value="">Seleccione modo...</option>
+          <option value="orbit">Visor 3D</option>
+          <option value="ra">Realidad Aumentada</option>
+        </select>
+
+        <!-- 2) Botón (+) estilo INM -->
+        <div class="cube-face">
+          <button id="upload-btn" class="file-btn" title="Subir modelo" aria-label="Subir modelo" disabled>+</button>
+          <span class="face-name">Subir modelo</span>
+        </div>
+
+        <!-- 3) Acciones -->
+        <button id="navigate-btn" disabled>Navegar</button>
+        <button id="marker-btn" style="display:none;">Descargar marcador</button>
+      </div>
+
+      <div id="status" class="status">Seleccione un modo de visualización</div>
+    </div>
+
+    <!-- Columna derecha -->
+    <div class="viewer-panel">
+      <div id="viewer"></div>
+    </div>
+  </section>
+</main>
+
+<footer>By rraum.LAB</footer>
+
+<!-- Librerías -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.105.2/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/panolens@0.12.0/build/panolens.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.105.2/examples/js/loaders/OBJLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.105.2/examples/js/loaders/STLLoader.js"></script>
+<script src="espacio-ra.js"></script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+:root {
+  --font-main: monospace;
+  --muted: #666666;
+  --line: #e5e5e5;
+}
+
+/* Layout igual a espacio.INM */
+.tool-main {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 48px;
+  align-items: start;
+  padding: 4cm;
+}
+
+/* Header */
+header {
+  padding-left: 4cm;
+  padding-right: 4cm;
+  margin-top: 0;
+  margin-bottom: 24px;
+}
+header h1 {
+  font-family: var(--font-main);
+  font-size: 24px;
+  font-weight: normal;
+  color: #000;
+  margin: 0;
+}
+header p.muted {
+  font-family: var(--font-main);
+  font-size: 14px;
+  font-weight: normal;
+  color: var(--muted);
+  margin: 4px 0 0 0;
+}
+
+/* Columna izquierda */
+.cube-inputs {
+  display: grid;
+  gap: 24px;
+}
+.cube-face {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Botón (+) estilo INM: cuadrado 60x60 con + grande centrado */
+.file-btn {
+  width: 60px;
+  height: 60px;
+  border: none;
+  background: #fff;
+  font-size: 60px;
+  font-weight: normal;
+  color: #000;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-main);
+}
+
+/* Etiqueta al lado del (+) */
+.face-name {
+  font-size: 12px;
+  color: var(--muted);
+  font-family: var(--font-main);
+  font-weight: normal;
+}
+
+/* Acciones (orden y estilo) */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+.actions button {
+  width: 130px;
+  height: 25px;
+  font-size: 12px;
+  font-weight: normal;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-main);
+}
+.actions select,
+.actions select option {
+  margin-top: 8px;
+  width: 130px;
+  text-align: center;
+  text-align-last: center;
+  font-family: var(--font-main);
+  font-size: 12px;
+}
+
+/* Estado */
+.status {
+  font-size: 12px;
+  color: var(--muted);
+  font-family: var(--font-main);
+}
+
+/* Visor: tamaño estable idéntico a espacio.INM (se fija por JS, pero estilo visual aquí) */
+.viewer-panel {
+  width: 100%;
+}
+#viewer {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: #000;
+  box-sizing: border-box;
+}
+
+/* Footer */
+footer {
+  color: #555353;
+  text-align: center;
+  padding: 16px;
+  font-family: var(--font-main);
+  font-size: 12px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+
+/* Panolens UI */
+.panolens-infobar,
+.panolens-control-bar input,
+.panolens-control-bar select,
+.panolens-control-bar option {
+  font-family: var(--font-main) !important;
+  font-size: 12px !important;
+  color: var(--muted) !important;
+  padding: 2px 6px !important;
+  text-align: center !important;
+  text-align-last: center !important;
+}

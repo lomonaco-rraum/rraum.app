@@ -197,22 +197,39 @@
 
   <div class="tabs">
     <div class="tab active">espacio.INM</div>
-    <div class="tab muted">visualización.RA</div>
+    <div class="tab active">visualización.RA</div>
     <div class="tab muted">sistemas.GR</div>
   </div>
 
+  <!-- Bloque espacio.INM -->
   <div class="tool">
     <p>
       Conversión de cubemaps a proyección equirectangular (2:1),
       pensada desde la percepción del observador ubicado en el
       centro del espacio.
     </p>
+    <button onclick="openTool('inm')">abrir espacio.INM →</button>
+  </div>
 
-    <button onclick="openTool()">
-      abrir herramienta →
-    </button>
+  <!-- Bloque espacio.RA -->
+  <div class="tool">
+    <p>
+      Visualización de modelos OBJ/LTS en modo Orbit o RA,
+      con opción de descarga de marcador para realidad aumentada.
+    </p>
+    <button onclick="openTool('ra')">abrir espacio.RA →</button>
   </div>
 </section>
+
+<script>
+  function openTool(which) {
+    if (which === 'inm') {
+      window.location.href = "espacio-inm/espacio-inm.html";
+    } else if (which === 'ra') {
+      window.location.href = "espacio-ra/espacio-ra.html";
+    }
+  }
+</script>
 
 <!-- ================= Sobre ================= -->
 
@@ -238,12 +255,6 @@
 <footer>
   rraum.LAB
 </footer>
-
-<script>
-  function openTool() {
-    window.location.href = "espacio-inm/espacio-inm.html";
-  }
-</script>
 
 </body>
 </html>
