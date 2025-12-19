@@ -1,5 +1,9 @@
 /* espacio.INM – layout específico */
 
+:root {
+  --font-main: "Helvetica Neue", Arial, sans-serif;
+}
+
 .tool-main {
   display: grid;
   grid-template-columns: 360px 1fr;
@@ -31,6 +35,43 @@ header p.muted {
   font-weight: normal;
   color: var(--muted, #666666);
   margin: 4px 0 0 0;
+}
+
+/* ================= Tabs ================= */
+
+.tabs {
+  display: flex;
+  justify-content: flex-start;
+  gap: 8px;
+  padding-left: 4cm;
+  padding-right: 4cm;
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--line, #e5e5e5);
+}
+
+.tab-btn {
+  font-family: var(--font-main);
+  font-size: 14px;
+  font-weight: normal;
+  color: #000;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.tab-btn.active {
+  border-bottom: 2px solid #000;
+  background: #f5f5f5;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
 }
 
 /* ================= Columna izquierda ================= */
@@ -118,22 +159,12 @@ header p.muted {
   width: 100%;
 }
 
-#viewer {
-  width: 100%;
-  aspect-ratio: 16 / 9;
+#viewer, #viewer-eqr {
+  width: 960px;
+  height: 540px;
   border: 1px solid var(--line, #ffffff);
-  border-radius: 0px; /* redondeo aumentado */
   background: #000;
   box-sizing: border-box;
-}
-
-/* ================= Textos Front/Back ================= */
-
-.texto-front, .texto-back {
-  font-family: var(--font-main);
-  font-size: 16px;
-  font-weight: normal;
-  color: #000;
 }
 
 /* ================= Footer ================= */

@@ -1,12 +1,12 @@
 /* ================= Botones de archivo ================= */
-
 const FACE_LABELS = {
   px: 'Right (+X)',
   nx: 'Left (−X)',
   py: 'Top (+Y)',
   ny: 'Bottom (−Y)',
   pz: 'Front (+Z)',
-  nz: 'Back (−Z)'
+  nz: 'Back (−Z)',
+  eqr: 'Equirectangular'
 };
 
 document.querySelectorAll('.file-btn').forEach(btn => {
@@ -14,46 +14,21 @@ document.querySelectorAll('.file-btn').forEach(btn => {
   const input = document.getElementById(targetId);
   const labelText = FACE_LABELS[targetId] || targetId.toUpperCase();
 
-  let nameEl =
-    document.querySelector(`label[for="${targetId}"]`) ||
-    (btn.nextElementSibling && btn.nextElementSibling.classList && btn.nextElementSibling.classList.contains('face-name') ? btn.nextElementSibling : null) ||
-    document.getElementById(`${targetId}-label`) ||
-    (btn.nextElementSibling && ['LABEL','SPAN'].includes(btn.nextElementSibling.tagName) ? btn.nextElementSibling : null);
+  btn.addEventListener('click', () => {
+    if (input) input.click();
+  });
 
-  if (nameEl) nameEl.textContent = labelText;
-
-  btn.setAttribute('title', labelText);
-  btn.setAttribute('aria-label', labelText);
-
-  btn.addEventListener('click', () => input && input.click());
-
-  // Miniatura + validación 1:1
   input && input.addEventListener('change', e => {
     const file = e.target.files && e.target.files[0];
     if (!file) {
       btn.innerHTML = '<span class="plus">+</span>';
-      if (nameEl) nameEl.textContent = labelText;
       return;
     }
-
-    const img = new Image();
-    img.onload = () => {
-      if (img.width !== img.height) {
-        alert("La imagen debe ser cuadrada (proporción 1:1).");
-        e.target.value = "";
-        btn.innerHTML = '<span class="plus">+</span>';
-        if (nameEl) nameEl.textContent = labelText;
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = ev => {
-        btn.innerHTML = `<img src="${ev.target.result}" alt="miniatura">`;
-        if (nameEl) nameEl.textContent = `${labelText}: ${file.name}`;
-      };
-      reader.readAsDataURL(file);
+    const reader = new FileReader();
+    reader.onload = ev => {
+      btn.innerHTML = `<img src="${ev.target.result}" alt="miniatura">`;
     };
-    img.src = URL.createObjectURL(file);
+    reader.readAsDataURL(file);
   });
 });
 
@@ -65,10 +40,12 @@ const readAsDataURL = file => new Promise((resolve, reject) => {
   r.readAsDataURL(file);
 });
 
-const statusEl = document.getElementById('status');
-const setStatus = msg => statusEl.textContent = msg || '';
+const setStatus = (id, msg) => {
+  const el = document.getElementById(id);
+  if (el) el.textContent = msg || '';
+};
 
-/* ================= Three.js ================= */
+/* ================= Three.js comunes ================= */
 const canvas = document.createElement('canvas');
 const renderer = new THREE.WebGLRenderer({
   canvas,
@@ -109,37 +86,45 @@ const renderTarget = new THREE.WebGLRenderTarget(4096, 2048, {
   format: THREE.RGBAFormat
 });
 
-/* ================= Panolens ================= */
+/* ================= Panolens viewers ================= */
 const viewer = new PANOLENS.Viewer({
   container: document.getElementById('viewer'),
   autoHideInfospot: true,
   controlBar: true,
   enableFullscreen: true
 });
-
-// 🔹 Modificación pedida: fondo transparente en el renderer
 viewer.renderer.setClearColor(0x000000, 0);
 
 let panorama = null;
 
-/* ================= Build ================= */
+const viewerEqr = new PANOLENS.Viewer({
+  container: document.getElementById('viewer-eqr'),
+  autoHideInfospot: true,
+  controlBar: true,
+  enableFullscreen: true
+});
+viewerEqr.renderer.setClearColor(0x000000, 0);
+
+let panoramaEqr = null;
+
+/* ================= Build CM → EQ ================= */
 document.getElementById('build').onclick = async () => {
   try {
     const ids = ['px','nx','py','ny','pz','nz'];
     for (const id of ids) {
       if (!document.getElementById(id).files[0]) {
-        setStatus('Falta subir: ' + id.toUpperCase());
+        setStatus('status','Falta subir: ' + id.toUpperCase());
         return;
       }
     }
 
-    setStatus('Leyendo imágenes…');
+    setStatus('status','Leyendo imágenes…');
     const urls = [];
     for (const id of ids) {
       urls.push(await readAsDataURL(document.getElementById(id).files[0]));
     }
 
-    setStatus('Cargando cubemap…');
+    setStatus('status','Cargando cubemap…');
     new THREE.CubeTextureLoader().load(urls, cube => {
       cube.encoding = THREE.sRGBEncoding;
       quad.material.uniforms.tCube.value = cube;
@@ -160,16 +145,16 @@ document.getElementById('build').onclick = async () => {
       viewer.add(panorama);
 
       document.getElementById('download').disabled = false;
-      setStatus('Listo ✓');
+      setStatus('status','Listo ✓');
     });
 
   } catch (e) {
     console.error(e);
-    setStatus('Error al generar panorama');
+    setStatus('status','Error al generar panorama');
   }
 };
 
-/* ================= Download ================= */
+/* ================= Download CM → EQ ================= */
 document.getElementById('download').onclick = () => {
   renderer.setRenderTarget(renderTarget);
   renderer.setSize(4096, 2048, false);
@@ -194,27 +179,122 @@ document.getElementById('download').onclick = () => {
   a.href = renderer.domElement.toDataURL('image/png');
   a.click();
 
-  setStatus('PNG descargado ✓');
+  setStatus('status','PNG descargado ✓');
 };
 
-/* ================= Ajustes de tamaño ================= */
-function fixViewerSize() {
-  const viewerEl = document.getElementById('viewer');
-  const width = 960;
-  const height = 540;
-  viewer.container.style.width = width + 'px';
-  viewer.container.style.height = height + 'px';
-  viewer.renderer.setSize(width, height);
-  viewer.onWindowResize();
-  viewer.updateControl();
-}
+document.getElementById('build-eqr').onclick = async () => {
+  try {
+    const input = document.getElementById('eqr');
+    if (!input || !input.files || input.files.length === 0) {
+      setStatus('status-eqr','Falta subir equirectangular');
+      return;
+    }
+    const file = input.files[0];
+    const url = await readAsDataURL(file);
 
-document.addEventListener('fullscreenchange', () => {
-  if (!document.fullscreenElement) {
-    setTimeout(fixViewerSize, 100);
+    // Mostrar EQ inmersiva en Panolens
+    if (panoramaEqr) viewerEqr.remove(panoramaEqr);
+    panoramaEqr = new PANOLENS.ImagePanorama(url);
+    viewerEqr.add(panoramaEqr);
+
+    // Cargar textura con filtros correctos
+    const texture = new THREE.TextureLoader().load(url);
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    texture.generateMipmaps = false;
+
+    cubeMapEqr = texture; // guardar para exportar
+
+    document.getElementById('download-eqr').disabled = false;
+    setStatus('status-eqr','Panorama listo ✓');
+  } catch (e) {
+    console.error(e);
+    setStatus('status-eqr','Error al generar cubemap');
   }
-});
+};
+/* ================Bloque Build =========== */
+document.getElementById('build-eqr').onclick = async () => {
+  const input = document.getElementById('eqr');
+  if (!input || !input.files || input.files.length === 0) {
+    setStatus('status-eqr','Falta subir equirectangular');
+    return;
+  }
+  const file = input.files[0];
+  const url = URL.createObjectURL(file);
 
-window.addEventListener('resize', () => {
-  fixViewerSize();
+  // Mostrar en visor Panolens
+  if (panoramaEqr) viewerEqr.remove(panoramaEqr);
+  panoramaEqr = new PANOLENS.ImagePanorama(url);
+  viewerEqr.add(panoramaEqr);
+
+  // 🔹 Aquí va tu bloque de TextureLoader
+  const texture = new THREE.TextureLoader().load(url);
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.generateMipmaps = false;
+  eqrTexture = texture;   // guardar para exportar
+
+  document.getElementById('download-eqr').disabled = false;
+  setStatus('status-eqr','Panorama listo ✓');
+};
+
+
+/* ================= Download EQ → CM ================= */
+document.getElementById('download-eqr').onclick = async () => {
+  if (!eqrTexture) {
+    setStatus('status-eqr','No hay equirectangular cargada');
+    return;
+  }
+
+  const sceneEqr = new THREE.Scene();
+  const sphere = new THREE.Mesh(
+    new THREE.SphereBufferGeometry(500, 60, 40),
+    new THREE.MeshBasicMaterial({ map: eqrTexture, side: THREE.BackSide })
+  );
+  sceneEqr.add(sphere);
+
+  const directions = [
+    { name: 'Right', dir: new THREE.Vector3(1,0,0), up: new THREE.Vector3(0,-1,0) },
+    { name: 'Left', dir: new THREE.Vector3(-1,0,0), up: new THREE.Vector3(0,-1,0) },
+    { name: 'Top', dir: new THREE.Vector3(0,1,0), up: new THREE.Vector3(0,0,1) },
+    { name: 'Bottom', dir: new THREE.Vector3(0,-1,0), up: new THREE.Vector3(0,0,-1) },
+    { name: 'Front', dir: new THREE.Vector3(0,0,1), up: new THREE.Vector3(0,-1,0) },
+    { name: 'Back', dir: new THREE.Vector3(0,0,-1), up: new THREE.Vector3(0,-1,0) }
+  ];
+
+  const cam = new THREE.PerspectiveCamera(90, 1, 0.1, 1000);
+  const zip = new JSZip();
+
+  for (const d of directions) {
+    cam.position.set(0,0,0);
+    cam.up.copy(d.up);
+    cam.lookAt(d.dir);
+
+    const rendererLocal = new THREE.WebGLRenderer({ preserveDrawingBuffer: true });
+    rendererLocal.setSize(1024, 1024);
+    rendererLocal.render(sceneEqr, cam);
+
+    const dataURL = rendererLocal.domElement.toDataURL('image/png');
+    const base64 = dataURL.split(',')[1];
+    zip.file(`${d.name}.png`, base64, {base64: true});
+  }
+
+  const zipName = prompt("Nombre del archivo ZIP:", "cubemap.zip") || "cubemap.zip";
+  const content = await zip.generateAsync({type:"blob"});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(content);
+  a.download = zipName;
+  a.click();
+
+  setStatus('status-eqr','ZIP descargado ✓');
+};
+
+/* ================= Tabs ================= */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.target).classList.add('active');
+  });
 });
