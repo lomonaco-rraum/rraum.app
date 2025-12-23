@@ -10,6 +10,7 @@
 <body>
 
 <header>
+  <button class="back-btn" onclick="location.href='../test.html?skipPreloader=true'">← Volver</button>
   <h1>espacio.INM</h1>
   <p class="muted">Conversión de panoramas</p>
 </header>
@@ -131,7 +132,12 @@
       document.getElementById(btn.dataset.target).classList.add('active');
     });
   });
-</script>
 
+  // 🔹 Función para el botón de volver
+  function goBack() {
+    window.history.back();
+  }
+</script>
 </body>
 </html>
+

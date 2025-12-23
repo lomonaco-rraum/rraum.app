@@ -1,0 +1,188 @@
+:root {
+  --bg: #ffffff;
+  --fg: #000000;
+  --muted: #666666;
+  --line: #e5e5e5;
+  --font-main: "Geist", sans-serif;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-main);
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.6;
+}
+
+h1, h2 {
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+
+h1 {
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+/* Barra superior */
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: var(--bg);
+  border-bottom: none;
+  z-index: 1000;
+}
+
+/* Logo más grande */
+.site-logo {
+  width: 60px;   /* ajustá este valor según tu preferencia */
+  height: auto;
+  display: block;
+  margin-left: 40px;
+}
+
+/* Menú centrado */
+.nav-center {
+  display: flex;
+  gap: 60px;              /* más espacio entre ítems */
+  font-size: 18px;
+  flex-grow: 1;
+  justify-content: center; /* podés probar space-evenly si querés más distribución */
+}
+
+.nav-center a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.nav-center a:hover {
+  text-decoration: underline;
+}
+
+/* Idiomas desplegable minimalista */
+.lang-menu {
+  position: relative;
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+  margin-right: 60px;   /* separación del borde derecho */
+  min-width: 50px;
+  text-align: right;
+}
+
+.lang-menu summary {
+  list-style: none;
+  outline: none;
+}
+
+.lang-options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.lang-options button {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+
+.lang-options button:hover {
+  text-decoration: underline;
+}
+
+/* despliegue hacia abajo */
+details[open] .lang-options {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--bg);
+  padding: 8px 0;
+}
+
+/* Contenido principal debajo de la barra */
+#home {
+  margin-top: 100px; /* espacio debajo de la barra */
+  text-align: center;
+}
+
+/* Footer */
+.lab-footer {
+  position: fixed;
+  bottom: 20px;
+  width: 100%;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+}
+
+/* Preloader centrado */
+#preloader {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: flex;
+  flex-direction: row;   /* cambia de columna a fila */
+  justify-content: center;
+  align-items: center;
+  background: var(--bg);
+  z-index: 2000;
+  gap: 20px;             /* espacio entre logo y texto */
+}
+
+.preloader-logo {
+  width: 100px;
+}
+
+.preloader-text {
+  font-size: 28px;
+  font-family: var(--font-main);
+  color: var(--fg);
+}
+
+/* Animación de los puntos */
+.dots::after {
+  content: '';
+  animation: dots 1.5s steps(3, end) infinite;
+}
+
+@keyframes dots {
+  0%   { content: ''; }
+  33%  { content: '.'; }
+  66%  { content: '..'; }
+  100% { content: '...'; }
+}
+
+/*botón de volver*/
+.back-btn {
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.back-btn:hover {
+  text-decoration: underline;
+}

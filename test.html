@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>rraum.LAB — Plataforma de recursos gráficos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="test.css">
+</head>
+<body>
+  <!-- Preloader -->
+  <div id="preloader">
+    <img src="logo.png" alt="Logo" class="preloader-logo">
+    <p class="preloader-text">rraum.LAB<span class="dots"></span></p>
+  </div>
+
+  <!-- Contenido de la página -->
+  <div id="page-content" style="display:none;">
+    <!-- Barra superior -->
+    <header class="app-header">
+      <!-- Logo a la izquierda -->
+      <img src="logo.png" alt="rraum.LAB logo" class="site-logo">
+
+      <!-- Menú centrado -->
+      <nav class="nav-center">
+        <a href="espacio-inm/espacio-inm.html">espacio.INM</a>
+        <a href="espacio-ra/espacio-ra.html">espacio.RA</a>
+        <a href="#news">Novedades</a>
+        <a href="#id">I+D</a>
+        <a href="#about">Quienes somos</a>
+      </nav>
+
+      <!-- Idiomas a la derecha -->
+      <details class="lang-menu">
+        <summary>ES</summary>
+        <div class="lang-options">
+          <button onclick="setLang('en')">EN</button>
+          <button onclick="setLang('it')">IT</button>
+        </div>
+      </details>
+    </header>
+
+    <!-- Portada -->
+    <main id="home">
+      <h2>Arte · Arquitectura · Ciencia aplicada</h2>
+      <h1>Plataforma de recursos gráficos</h1>
+    </main>
+
+    <!-- Footer -->
+    <footer class="lab-footer">
+      rraum.LAB
+    </footer>
+  </div>
+
+  <!-- Script que controla el preloader -->
+  <script src="test.js"></script>
+
+  <script>
+    function setLang(lang) {
+      console.log("Idioma seleccionado:", lang);
+      // Aquí podés redirigir a otra versión si querés:
+      // window.location.href = `index-${lang}.html`;
+    }
+  </script>
+</body>
+</html>

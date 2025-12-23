@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <title>rraum.LAB — Plataforma de recursos gráficos</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@vercel/geist-font@latest/dist/geist.css">
+  <link rel="stylesheet" href="base.css">
 
   <style>
     /* ================= Base ================= */
@@ -23,7 +25,7 @@
       margin: 0;
       background: var(--bg);
       color: var(--fg);
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-family: "Geist", sans-serif;
       line-height: 1.45;
     }
 
@@ -153,20 +155,37 @@
 
 <body>
 
-<!-- ================= Portada ================= -->
+<body>
 
+<!-- Logo fijo arriba a la izquierda -->
+<header class="app-header">
+  <div class="header-left">
+    <img src="logo.png" alt="rraum.LAB logo" class="site-logo">
+  </div>
+
+  <nav class="nav-center">
+    <a href="espacio-inm/index.html">espacio.INM</a>
+    <a href="espacio-ra/index.html">espacio.RA</a>
+    <a href="#news">Novedades</a>
+    <a href="#id">I+D</a>
+    <a href="#about">Quienes somos</a>
+  </nav>
+
+  <div class="lang">
+    <button onclick="setLang('es')">ES</button>
+    <button onclick="setLang('en')">EN</button>
+    <button onclick="setLang('it')">IT</button>
+  </div>
+</header>
+
+<!-- ================= Portada ================= -->
 <header id="home">
   <div>
     <h1>rraum.LAB</h1>
     <p class="muted">Plataforma de recursos gráficos</p>
     <p class="muted">Arte · Arquitectura · Ciencia aplicada</p>
   </div>
-
-  <div class="lang">
-    <span>ES</span>
-    <span class="muted">/</span>
-    <span class="muted">EN</span>
-  </div>
+ 
 
   <div>
     <p>Paula Lomonaco</p>
