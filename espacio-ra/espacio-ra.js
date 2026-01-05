@@ -12,6 +12,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const setStatus = msg => (statusEl.textContent = msg || '');
 
+  // 🔎 Detección de dispositivo
+  function isMobile() {
+    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  }
+  if (isMobile()) {
+    document.body.classList.add('mobile');
+  } else {
+    document.body.classList.add('desktop');
+  }
+
   // Ajuste: posiciona el vértice mínimo en (0,0,0) y escala al cubo 10x10x10
   function fitObjectToCubeWithBase(object) {
     const group = new THREE.Group();
@@ -30,10 +40,10 @@ document.addEventListener('DOMContentLoaded', () => {
     return group;
   }
 
-  // Tamaño estable del visor Orbit
+  // Tamaño estable del visor Orbit (ajustado según dispositivo)
   function fixViewerSize() {
-    const width = 960;
-    const height = 540;
+    const width = isMobile() ? window.innerWidth : 960;
+    const height = isMobile() ? 400 : 540;
 
     if (viewer) {
       viewer.container.style.width = width + 'px';
@@ -109,20 +119,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function initViewerRA(fileUrl) {
+  function initViewerRA(fileUrl, ext) {
     // Mostrar RA, ocultar Orbit
     viewerEl.style.display = 'none';
     viewerRAEl.style.display = 'block';
 
     setStatus('Modo RA listo: apunte la cámara al marcador');
 
-    // Inyectar el modelo cargado en el <a-entity> dentro del marcador
     const markerEntity = viewerRAEl.querySelector('a-marker a-entity');
-    if (markerEntity && fileUrl) {
-      // Para OBJ (como estás usando), es suficiente:
-      markerEntity.setAttribute('obj-model', `url(${fileUrl})`);
-      // Si en el futuro soportás STL en RA, deberías cambiar a:
-      // markerEntity.setAttribute('stl-model', `url(${fileUrl})`);
+    if (markerEntity) {
+      // limpiar atributos previos
+      markerEntity.removeAttribute('obj-model');
+      markerEntity.removeAttribute('stl-model');
+
+      if (fileUrl && ext === 'obj') {
+        markerEntity.setAttribute('obj-model', `url(${fileUrl})`);
+      } else if (fileUrl && ext === 'stl') {
+        // STL requiere un componente extra en A‑Frame
+        markerEntity.setAttribute('stl-model', `url(${fileUrl})`);
+      }
     }
   }
 
@@ -198,15 +213,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentMode === 'orbit') {
       initViewer3D(fileUrl, ext);
     } else if (currentMode === 'ra') {
-      initViewerRA(fileUrl);
+      initViewerRA(fileUrl, ext);
     }
   };
 
   // Descargar marcador
   markerBtn.onclick = () => {
     const a = document.createElement('a');
-    a.download = 'marker.png';   // nombre del archivo
-    a.href = 'marker.png';       // misma carpeta que index.html
+    a.download = 'marker.png';
+    a.href = 'marker.png';
     a.click();
     setStatus('Marcador descargado ✓');
   };

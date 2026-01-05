@@ -141,3 +141,43 @@ footer {
   text-align: center !important;
   text-align-last: center !important;
 }
+
+/* --- Ajustes RA --- */
+#viewer-ra a-scene {
+  position: relative;
+  width: 960px;   /* mismo tamaño que Orbit */
+  height: 540px;
+  z-index: 1;     /* debajo de tu panel de botones */
+}
+
+.cube-inputs, header, footer {
+  position: relative;
+  z-index: 2;     /* encima del canvas RA */
+}
+
+/* --- Adaptación por dispositivo --- */
+body.desktop #viewer-ra a-scene {
+  width: 960px;
+  height: 540px;
+}
+
+body.mobile #viewer-ra a-scene {
+  width: 100%;
+  height: 400px;
+}
+
+body.desktop .tool-main {
+  grid-template-columns: 360px 1fr;
+  padding: 4cm;
+}
+
+body.mobile .tool-main {
+  grid-template-columns: 1fr;
+  gap: 24px;
+  padding: 1cm;
+}
+
+body.mobile header {
+  padding-left: 1cm;
+  padding-right: 1cm;
+}
