@@ -41,18 +41,36 @@
 
     <!-- Columna derecha -->
     <div class="viewer-panel">
+      <!-- Visor Orbit (Panolens) -->
       <div id="viewer"></div>
+
+      <!-- Visor RA (A‑Frame + AR.js), oculto por defecto -->
+      <div id="viewer-ra" style="display:none;">
+        <a-scene embedded arjs>
+          <a-marker type="pattern" url="marker.patt">
+            <!-- Aquí se cargará tu modelo -->
+            <a-entity obj-model="url:modelo.obj"></a-entity>
+          </a-marker>
+          <a-entity camera></a-entity>
+        </a-scene>
+      </div>
     </div>
   </section>
 </main>
 
 <footer>By rraum.LAB</footer>
 
-<!-- Librerías -->
+<!-- Librerías Orbit -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.105.2/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/panolens@0.12.0/build/panolens.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.105.2/examples/js/loaders/OBJLoader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.105.2/examples/js/loaders/STLLoader.js"></script>
+
+<!-- Librerías RA -->
+<script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+<script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.2.1/aframe/build/aframe-ar.js"></script>
+
+<!-- Lógica -->
 <script src="espacio-ra.js"></script>
 </body>
 </html>
