@@ -205,8 +205,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Descargar marcador (placeholder)
   markerBtn.onclick = () => {
     const a = document.createElement('a');
-    a.download = 'marker.png';
-    a.href = 'ruta/al/marcador.png';
+    a.download = 'rraumlab-marcador.png';
+    a.href = 'rraumlab-marcador.png';
     a.click();
     setStatus('Marcador descargado ✓');
   };
