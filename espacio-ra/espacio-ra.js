@@ -115,7 +115,15 @@ document.addEventListener('DOMContentLoaded', () => {
     viewerRAEl.style.display = 'block';
 
     setStatus('Modo RA listo: apunte la cámara al marcador');
-    // El <a-scene> en tu HTML se encarga de activar la cámara
+
+    // Inyectar el modelo cargado en el <a-entity> dentro del marcador
+    const markerEntity = viewerRAEl.querySelector('a-marker a-entity');
+    if (markerEntity && fileUrl) {
+      // Para OBJ (como estás usando), es suficiente:
+      markerEntity.setAttribute('obj-model', `url(${fileUrl})`);
+      // Si en el futuro soportás STL en RA, deberías cambiar a:
+      // markerEntity.setAttribute('stl-model', `url(${fileUrl})`);
+    }
   }
 
   // Menú de modos
