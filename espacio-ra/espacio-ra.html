@@ -47,13 +47,17 @@
       <div id="viewer"></div>
 
       <div id="viewer-ra" style="display:none;">
-        <a-scene embedded arjs>
+        <a-scene
+          embedded
+          arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
+        >
           <a-marker type="pattern" url="raumlab-logo.patt">
             <a-entity></a-entity>
           </a-marker>
           <a-entity camera></a-entity>
         </a-scene>
       </div>
+
     </div>
   </section>
 </main>

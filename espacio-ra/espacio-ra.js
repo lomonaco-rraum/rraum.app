@@ -206,22 +206,26 @@ document.addEventListener('DOMContentLoaded', () => {
     input.click();
   };
 
-  // Navegar
-  navigateBtn.onclick = () => {
-    const fileUrl = uploadBtn.dataset.file;
-    const ext = uploadBtn.dataset.ext;
+// Navegar
+navigateBtn.onclick = () => {
+  const fileUrl = uploadBtn.dataset.file;
+  const ext = uploadBtn.dataset.ext;
 
-    if (!fileUrl) {
-      setStatus('Primero cargue un modelo');
-      return;
-    }
+  if (!fileUrl) {
+    setStatus('Primero cargue un modelo');
+    return;
+  }
 
-    if (currentMode === 'orbit') {
-      initViewer3D(fileUrl, ext);
-    } else if (currentMode === 'ra') {
-      initViewerRA(fileUrl, ext);
-    }
-  };
+  if (currentMode === 'orbit') {
+    initViewer3D(fileUrl, ext);
+  } else if (currentMode === 'ra') {
+    initViewerRA(fileUrl, ext);
+
+    // 👉 activar fullscreen RA
+    document.body.classList.add('ra-fullscreen');
+    setStatus('Cámara activada: apunte al marcador');
+  }
+};
 
   // Descargar marcador
   markerBtn.onclick = () => {
