@@ -142,33 +142,35 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Menú de modos
-  viewModeSelect.onchange = e => {
-    currentMode = e.target.value;
+viewModeSelect.onchange = e => {
+  currentMode = e.target.value;
 
-    // 👉 Cambio agregado: clases en body para controlar visores
-    document.body.classList.remove('orbit-mode', 'ra-mode');
-    if (currentMode) {
-      document.body.classList.add(currentMode + '-mode');
-    }
+  if (currentMode === 'ra') {
+    document.getElementById('viewer-ra').style.display = 'block';
+    document.getElementById('viewer').style.display = 'none';
+  } else if (currentMode === 'orbit') {
+    document.getElementById('viewer-ra').style.display = 'none';
+    document.getElementById('viewer').style.display = 'block';
+  }
 
-    uploadBtn.disabled = !currentMode;
-    navigateBtn.disabled = true;
-    markerBtn.style.display = 'none';
+  uploadBtn.disabled = !currentMode;
+  navigateBtn.disabled = true;
+  markerBtn.style.display = 'none';
 
-    setStatus(
-      currentMode === 'orbit'
-        ? 'Seleccione un modelo para cargar en visor 3D'
-        : currentMode === 'ra'
-          ? 'Seleccione un modelo para cargar en RA'
-          : 'Seleccione un modo de visualización'
-    );
+  setStatus(
+    currentMode === 'orbit'
+      ? 'Seleccione un modelo para cargar en visor 3D'
+      : currentMode === 'ra'
+        ? 'Seleccione un modelo para cargar en RA'
+        : 'Seleccione un modo de visualización'
+  );
 
-    uploadBtn.textContent = '+';
-    uploadBtn.style.fontSize = '60px';
-    if (faceNameEl) faceNameEl.textContent = 'Subir modelo';
+  uploadBtn.textContent = '+';
+  uploadBtn.style.fontSize = '60px';
+  if (faceNameEl) faceNameEl.textContent = 'Subir modelo';
 
-    fixViewerSize();
-  };
+  fixViewerSize();
+};
 
   // Botón (+)
   uploadBtn.onclick = () => {
