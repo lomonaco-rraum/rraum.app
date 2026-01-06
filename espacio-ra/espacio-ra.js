@@ -144,9 +144,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Menú de modos
   viewModeSelect.onchange = e => {
     currentMode = e.target.value;
-    document.body.classList.remove('orbit-mode', 'ra-mode');
-    document.body.classList.add(currentMode + '-mode');
 
+    // 👉 Cambio agregado: clases en body para controlar visores
+    document.body.classList.remove('orbit-mode', 'ra-mode');
+    if (currentMode) {
+      document.body.classList.add(currentMode + '-mode');
+    }
 
     uploadBtn.disabled = !currentMode;
     navigateBtn.disabled = true;
