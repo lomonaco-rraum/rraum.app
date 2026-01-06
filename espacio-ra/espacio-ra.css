@@ -77,16 +77,22 @@ header p.muted {
   gap: 12px;
   margin-top: 16px;
 }
+
 .actions button {
   width: 130px;
   height: 25px;
   font-size: 12px;
   font-weight: normal;
-  background: transparent;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
   border: none;
+  border-radius: 4px;
   cursor: pointer;
   font-family: var(--font-main);
+  position: relative;
+  z-index: 10;
 }
+
 .actions select,
 .actions select option {
   margin-top: 8px;
@@ -97,12 +103,19 @@ header p.muted {
   font-size: 12px;
 }
 
-/* Estado */
-.status {
+#status {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 6px 12px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
   font-size: 12px;
-  color: var(--muted);
+  border-radius: 4px;
+  z-index: 10;
   font-family: var(--font-main);
 }
+
 
 /* Visor: tamaño estable idéntico a espacio.INM (se fija por JS, pero estilo visual aquí) */
 .viewer-panel {
@@ -180,4 +193,17 @@ body.mobile .tool-main {
 body.mobile header {
   padding-left: 1cm;
   padding-right: 1cm;
+}
+
+#viewer,
+#viewer-ra {
+  display: none;
+}
+
+body.orbit-mode #viewer {
+  display: block;
+}
+
+body.ra-mode #viewer-ra {
+  display: block;
 }
