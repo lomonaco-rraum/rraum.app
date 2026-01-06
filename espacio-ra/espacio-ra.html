@@ -9,17 +9,6 @@
   <!-- Librerías RA: actualizadas -->
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/ar-js-org@3.4.6/aframe/build/aframe-ar.min.js"></script>
-  <script>
-  document.getElementById('view-mode').addEventListener('change', e => {
-    const mode = e.target.value;
-    if (mode === 'ra') {
-      document.getElementById('viewer-ra').style.display = 'block';
-      document.getElementById('viewer').style.display = 'none';
-      document.body.classList.add('ra-fullscreen');
-    }
-  });
-</script>
-
 </head>
 <body>
 
@@ -33,21 +22,54 @@
     <!-- Columna izquierda -->
     <div class="cube-inputs">
       <div class="actions">
+        <!-- Selector de modo principal -->
         <select id="view-mode" aria-label="Modo de visualización">
           <option value="">Seleccione modo...</option>
           <option value="orbit">Visor 3D</option>
           <option value="ra">Realidad Aumentada</option>
         </select>
 
+        <!-- Botón de carga -->
         <div class="cube-face">
           <button id="upload-btn" class="file-btn" title="Subir modelo" aria-label="Subir modelo" disabled>+</button>
           <span class="face-name">Subir modelo</span>
         </div>
 
+        <!-- Botones de acción -->
         <button id="navigate-btn" disabled>Navegar</button>
         <button id="camera-btn" disabled style="display:none;">Acceder a cámara</button>
         <button id="marker-btn" style="display:none;">Descargar marcador</button>
 
+        <!-- 🔧 NUEVOS SELECTORES -->
+        <select id="viz-mode" aria-label="Modo de visualización del modelo">
+          <option value="">Visualización...</option>
+          <option value="solid">Sólido</option>
+          <option value="wire">Alámbrico</option>
+          <option value="light">Iluminado</option>
+        </select>
+
+        <select id="projection" aria-label="Modo de proyección">
+          <option value="">Proyección...</option>
+          <option value="perspective">Perspectiva</option>
+          <option value="parallel">Paralela</option>
+        </select>
+
+        <select id="orientation" aria-label="Orientación de cámara">
+          <option value="">Orientación...</option>
+          <option value="top">Top</option>
+          <option value="bottom">Bottom</option>
+          <option value="front">Front</option>
+          <option value="back">Back</option>
+          <option value="left">Left</option>
+          <option value="right">Right</option>
+          <!-- Isometrías paralelas -->
+          <option value="iso_so">Isometría SO</option>
+          <option value="iso_no">Isometría NO</option>
+          <option value="iso_se">Isometría SE</option>
+          <option value="iso_ne">Isometría NE</option>
+          <!-- Isometría en perspectiva -->
+          <option value="iso">Isométrica (perspectiva)</option>
+        </select>
       </div>
 
       <div id="status" class="status">Seleccione un modo de visualización</div>
@@ -68,7 +90,6 @@
           <a-entity camera></a-entity>
         </a-scene>
       </div>
-
     </div>
   </section>
 </main>
@@ -83,5 +104,46 @@
 
 <!-- Lógica -->
 <script src="espacio-ra.js"></script>
+
+<!-- Bloque de control de visores y menús -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const viewMode = document.getElementById('view-mode');
+    const projectionSelect = document.getElementById('projection');
+    const orientationSelect = document.getElementById('orientation');
+    const vizModeSelect = document.getElementById('viz-mode');
+
+    // Orbit vs RA
+    viewMode.addEventListener('change', e => {
+      const mode = e.target.value;
+      if (mode === 'orbit') {
+        document.getElementById('viewer').style.display = 'block';
+        document.getElementById('viewer-ra').style.display = 'none';
+      } else if (mode === 'ra') {
+        document.getElementById('viewer-ra').style.display = 'block';
+        document.getElementById('viewer').style.display = 'none';
+        document.body.classList.add('ra-fullscreen');
+      }
+    });
+
+    // Listener de proyección
+    projectionSelect.addEventListener('change', e => {
+      const proj = e.target.value;
+      setProjectionMode(proj); // función en espacio-ra.js
+    });
+
+    // Listener de orientación
+    orientationSelect.addEventListener('change', e => {
+      const view = e.target.value;
+      setCameraOrientation(view); // función en espacio-ra.js
+    });
+
+    // Listener de visualización
+    vizModeSelect.addEventListener('change', e => {
+      const mode = e.target.value;
+      setVisualizationMode(mode); // función en espacio-ra.js
+    });
+  });
+</script>
 </body>
 </html>
