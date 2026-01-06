@@ -116,7 +116,6 @@ header p.muted {
   font-family: var(--font-main);
 }
 
-
 /* Visor: tamaño estable idéntico a espacio.INM (se fija por JS, pero estilo visual aquí) */
 .viewer-panel {
   width: 100%;
@@ -195,6 +194,7 @@ body.mobile header {
   padding-right: 1cm;
 }
 
+/* Mostrar/ocultar visores según el modo */
 #viewer,
 #viewer-ra {
   display: none;
@@ -206,4 +206,19 @@ body.orbit-mode #viewer {
 
 body.ra-mode #viewer-ra {
   display: block;
+}
+
+/* --- RA fullscreen --- */
+body.ra-fullscreen #viewer-ra a-scene {
+  position: fixed;
+  inset: 0;       /* top:0; right:0; bottom:0; left:0 */
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+body.ra-fullscreen header,
+body.ra-fullscreen .cube-inputs,
+body.ra-fullscreen footer {
+  display: none;
 }
