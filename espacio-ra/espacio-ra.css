@@ -1,224 +1,38 @@
-:root {
-  --font-main: Geist;
-  --muted: #666666;
-  --line: #e5e5e5;
-}
-
-/* Layout igual a espacio.INM */
-.tool-main {
-  display: grid;
-  grid-template-columns: 360px 1fr;
-  gap: 48px;
-  align-items: start;
-  padding: 4cm;
-}
-
-/* Header */
-header {
-  padding-left: 4cm;
-  padding-right: 4cm;
-  margin-top: 0;
-  margin-bottom: 24px;
-}
-header h1 {
-  font-family: var(--font-main);
-  font-size: 24px;
-  font-weight: normal;
-  color: #000;
+body {
   margin: 0;
-}
-header p.muted {
-  font-family: var(--font-main);
-  font-size: 14px;
-  font-weight: normal;
-  color: var(--muted);
-  margin: 4px 0 0 0;
+  font-family: sans-serif;
+  background: #111;
+  color: #eee;
 }
 
-/* Columna izquierda */
-.cube-inputs {
-  display: grid;
-  gap: 24px;
-}
-.cube-face {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* Botón (+) estilo INM: cuadrado 60x60 con + grande centrado */
-.file-btn {
-  width: 60px;
-  height: 60px;
-  border: none;
-  background: #fff;
-  font-size: 60px;
-  font-weight: normal;
-  color: #000;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-main);
-}
-
-/* Etiqueta al lado del (+) */
-.face-name {
-  font-size: 12px;
-  color: var(--muted);
-  font-family: var(--font-main);
-  font-weight: normal;
-}
-
-/* Acciones (orden y estilo) */
-.actions {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 16px;
-}
-
-.actions button {
-  width: 130px;
-  height: 25px;
-  font-size: 12px;
-  font-weight: normal;
-  background: rgba(0,0,0,0.5);
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-family: var(--font-main);
-  position: relative;
-  z-index: 10;
-}
-
-.actions select,
-.actions select option {
-  margin-top: 8px;
-  width: 130px;
-  text-align: center;
-  text-align-last: center;
-  font-family: var(--font-main);
-  font-size: 12px;
-}
-
-#status {
+header {
   position: absolute;
   top: 10px;
   left: 10px;
-  padding: 6px 12px;
-  background: rgba(0,0,0,0.6);
-  color: #fff;
-  font-size: 12px;
-  border-radius: 4px;
   z-index: 10;
-  font-family: var(--font-main);
+  background: rgba(0,0,0,0.6);
+  padding: 10px;
+  border-radius: 6px;
 }
 
-/* Visor: tamaño estable idéntico a espacio.INM (se fija por JS, pero estilo visual aquí) */
-.viewer-panel {
-  width: 100%;
-}
-#viewer {
-  width: 100%;
-  border: 1px solid var(--line);
-  border-radius: 0;
-  background: #000;
-  box-sizing: border-box;
+.controls {
+  display: flex;
+  gap: 10px;
 }
 
-/* Footer */
-footer {
-  color: #555353;
-  text-align: center;
-  padding: 16px;
-  font-family: var(--font-main);
-  font-size: 12px;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
+button, input[type="file"] {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
-/* Panolens UI */
-.panolens-infobar,
-.panolens-control-bar input,
-.panolens-control-bar select,
-.panolens-control-bar option {
-  font-family: var(--font-main) !important;
-  font-size: 12px !important;
-  color: var(--muted) !important;
-  padding: 2px 6px !important;
-  text-align: center !important;
-  text-align-last: center !important;
+button {
+  background: #4CC3D9;
+  color: #000;
+  font-weight: bold;
 }
 
-/* --- Ajustes RA --- */
-#viewer-ra a-scene {
-  position: relative;
-  width: 960px;   /* mismo tamaño que Orbit */
-  height: 540px;
-  z-index: 1;     /* debajo de tu panel de botones */
-}
-
-.cube-inputs, header, footer {
-  position: relative;
-  z-index: 2;     /* encima del canvas RA */
-}
-
-/* --- Adaptación por dispositivo --- */
-body.desktop #viewer-ra a-scene {
-  width: 960px;
-  height: 540px;
-}
-
-body.mobile #viewer-ra a-scene {
-  width: 100%;
-  height: 400px;
-}
-
-body.desktop .tool-main {
-  grid-template-columns: 360px 1fr;
-  padding: 4cm;
-}
-
-body.mobile .tool-main {
-  grid-template-columns: 1fr;
-  gap: 24px;
-  padding: 1cm;
-}
-
-body.mobile header {
-  padding-left: 1cm;
-  padding-right: 1cm;
-}
-
-/* Mostrar/ocultar visores según el modo */
-#viewer,
-#viewer-ra {
-  display: none;
-}
-
-body.orbit-mode #viewer {
-  display: block;
-}
-
-body.ra-mode #viewer-ra {
-  display: block;
-}
-
-/* --- RA fullscreen --- */
-body.ra-fullscreen #viewer-ra a-scene {
-  position: fixed;
-  inset: 0;       /* top:0; right:0; bottom:0; left:0 */
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-}
-
-body.ra-fullscreen header,
-body.ra-fullscreen .cube-inputs,
-body.ra-fullscreen footer {
-  display: none;
+button:hover {
+  background: #3aa0b5;
 }
