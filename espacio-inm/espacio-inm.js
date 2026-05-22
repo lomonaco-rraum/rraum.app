@@ -129,7 +129,7 @@ document.getElementById('build').onclick = async () => {
       cube.encoding = THREE.sRGBEncoding;
       quad.material.uniforms.tCube.value = cube;
 
-      renderer.setSize(2048, 1024, false);
+      renderer.setSize(4096, 2048, false);
       renderer.render(scene, camera);
 
       const panoURL = renderer.domElement.toDataURL('image/png');
